@@ -4,10 +4,9 @@ import { TodoSection } from "@/components/TodoSection";
 
 export default function Home() {
   return (
-    <main className="flex mx-auto max-w-screen-xl">
+    <main className="flex mx-auto max-w-screen-xl items-center justify-center">
       <MenuSection />
       <TodoSection />
-      <ProfileSection />
     </main>
   );
 }

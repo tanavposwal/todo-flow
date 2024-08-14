@@ -1,19 +1,36 @@
 "use client";
 
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import { Checkbox } from "./ui/checkbox";
 import { Button } from "./ui/button";
-import { Cross1Icon, DragHandleDots2Icon } from "@radix-ui/react-icons";
+import {
+  Cross1Icon,
+  DragHandleDots2Icon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-export default function TodoEditor() {
-  const [lines, setLines] = useState([{ id: "1", text: "", checked: false }]);
+interface TodoLine {
+  id: string;
+  text: string;
+  checked: boolean;
+}
+
+export default function TodoEditor({open}: {open: string}) {
+  const [lines, setLines] = useState<TodoLine[]>([])  
+
+  useEffect(() => {
+    if (localStorage.getItem(open)) {
+      setLines(JSON.parse(localStorage.getItem(open)!))
+    } else {
+      setLines([])
+    }
+  }, [open])
 
   const handleInputChange = (
     index: number,
@@ -22,102 +39,94 @@ export default function TodoEditor() {
     const newLines = [...lines];
     newLines[index].text = event.target.value;
     setLines(newLines);
+    localStorage.setItem(open, JSON.stringify(lines))
   };
 
   const handleCheckboxChange = (index: number) => {
     const newLines = [...lines];
     newLines[index].checked = !newLines[index].checked;
     setLines(newLines);
+    localStorage.setItem(open, JSON.stringify(lines))
   };
 
-  const handleKeyPress = (
+  const handleDelete = (index: number) => {
+    const newLines = lines.filter((_, i) => i !== index);
+    setLines(newLines);
+    localStorage.setItem(open, JSON.stringify(lines))
+  };
+
+  const handleKeyDown = (
     index: number,
     event: KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
-      setLines([...lines, { id: `${Date.now()}`, text: "", checked: false }]);
+      setLines([
+        ...lines,
+        { id: Date.now().toString(), text: "", checked: false },
+      ]);
+      localStorage.setItem(open, JSON.stringify(lines))
     }
   };
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const items = Array.from(lines);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    setLines(items);
+  const addTodo = () => {
+    setLines([
+      ...lines,
+      { id: Date.now().toString(), text: "", checked: false },
+    ]);
+    localStorage.setItem(open, JSON.stringify(lines))
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="todos">
-        {(provided) => (
-          <div
-            className="flex flex-col gap-2"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {lines.map((line, index) => (
-              <Draggable
-                key={line.id}
-                draggableId={line.id}
-                index={index}
-              >
-                {(provided) => (
-                  <div
-                    className="flex flex-1 justify-center items-center gap-2 transition-opacity"
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: "8px",
-                      ...provided.draggableProps.style,
-                    }}
-                  >
-                    <button className="cursor-grab text-neutral-600">
-                      <DragHandleDots2Icon />
-                    </button>
+    <div className="flex flex-col gap-1">
+      {lines.map((line, index) => (
+        <div
+          key={line.id}
+          className="flex flex-1 justify-center items-center gap-2 transition-opacity"
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <button className="cursor-grab text-neutral-600">
+            <DragHandleDots2Icon />
+          </button>
 
-                    <Checkbox
-                      checked={line.checked}
-                      onCheckedChange={() => handleCheckboxChange(index)}
-                    />
-                    <input
-                      type="text"
-                      value={line.text}
-                      onChange={(event) => handleInputChange(index, event)}
-                      onKeyDown={(event) => handleKeyPress(index, event)}
-                      className="px-2 py-1 outline-none rounded-md text-neutral-300 bg-transparent"
-                      style={{
-                        flex: 1,
-                        textDecoration: line.checked ? "line-through" : "none",
-                      }}
-                    />
-                    <div>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button>
-                              <Cross1Icon />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>delete</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
+          <Checkbox
+            checked={line.checked}
+            onCheckedChange={() => handleCheckboxChange(index)}
+          />
+          <input
+            type="text"
+            value={line.text}
+            onChange={(event) => handleInputChange(index, event)}
+            onKeyDown={(event) => handleKeyDown(index, event)}
+            className="px-2 py-1 outline-none rounded-md text-neutral-300 bg-transparent placeholder:text-neutral-600"
+            placeholder="todo..."
+            style={{
+              flex: 1,
+              textDecoration: line.checked ? "line-through" : "none",
+            }}
+          />
+          <div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={() => handleDelete(index)}>
+                    <Cross1Icon />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>delete</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+        </div>
+      ))}
+      <Button variant="outline" size="sm" onClick={() => addTodo()}>
+        <PlusIcon className="mr-2 h-4 w-4" />
+        Add
+      </Button>
+    </div>
   );
 }
