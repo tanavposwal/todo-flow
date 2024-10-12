@@ -2,9 +2,9 @@ import { CheckCircledIcon } from "@radix-ui/react-icons"
 
 export const Logo = () => {
   return (
-    <div className="flex gap-1 w-fit h-fit items-end">
-        <CheckCircledIcon className="w-8 h-8 stroke-[4px] text-green-500" />
-        <p className="text-4xl font-black">Todo</p>
+    <div className="flex gap-2 w-fit h-fit items-center justify-center select-none">
+        <CheckCircledIcon className="w-6 h-6 stroke-[4px] text-green-500" />
+        <p className="text-3xl font-extrabold">Todo</p>
     </div>
   )
 }

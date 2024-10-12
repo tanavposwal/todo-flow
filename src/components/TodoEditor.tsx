@@ -77,8 +77,9 @@ export default function TodoEditor({open}: {open: string}) {
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      {lines.map((line, index) => (
+    <div className="flex flex-col gap-3">
+      <div>
+        {lines.map((line, index) => (
         <div
           key={line.id}
           className="flex flex-1 justify-center items-center gap-2 transition-opacity"
@@ -100,12 +101,13 @@ export default function TodoEditor({open}: {open: string}) {
             value={line.text}
             onChange={(event) => handleInputChange(index, event)}
             onKeyDown={(event) => handleKeyDown(index, event)}
-            className="px-2 py-1 outline-none rounded-md text-neutral-300 bg-transparent placeholder:text-neutral-600"
+            className="px-2 py-1 outline-none rounded-md text-foreground bg-transparent placeholder:text-neutral-500"
             placeholder="todo..."
             style={{
               flex: 1,
               textDecoration: line.checked ? "line-through" : "none",
             }}
+            
           />
           <div>
             <TooltipProvider>
@@ -123,6 +125,7 @@ export default function TodoEditor({open}: {open: string}) {
           </div>
         </div>
       ))}
+      </div>
       <Button variant="outline" size="sm" onClick={() => addTodo()}>
         <PlusIcon className="mr-2 h-4 w-4" />
         Add

@@ -30,24 +30,24 @@ export const TodoSection = () => {
   };
 
   return (
-    <section className="w-[60vw] border-x-2 h-screen flex flex-col">
-      <div className="flex px-2 py-2 gap-2 overflow-y-auto relative group sm-scroll border-b-2">
+    <section className="flex flex-col">
+      <div className="flex px-3 pt-2 gap-1 overflow-x-auto sm-scroll border-popover-foreground border-b-2">
         {tabs.map((val) => (
-          <Tab title={val} open={open} setOpen={setOpen} />
+          <Tab title={val} open={open} setOpen={setOpen} key={val} />
         ))}
 
-        <div className="sticky top-50% right-0 group-hover:opacity-100 opacity-0 transition-all">
+        <div>
           <Button
             variant="ghost"
             size="icon"
-            className="bg-neutral-900 h-full"
+            className="rounded-full h-full"
             onClick={() => addTab()}
           >
             <PlusIcon />
           </Button>
         </div>
       </div>
-      <div className="p-3 pl-4">
+      <div className="p-3 pl-4 h-fit overflow-y-auto sm-scroll">
         <TodoEditor open={open} />
       </div>
     </section>
