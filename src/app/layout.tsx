@@ -24,13 +24,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(
           "h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.className
         )}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
-            disableTransitionOnChange
           >
             {children}
           </ThemeProvider>
